@@ -4,13 +4,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SystemPropertyUtils;
 import uiys.common.util.TransUtils;
@@ -22,7 +23,8 @@ import java.util.Map;
 import java.util.Set;
 
 @Slf4j
-@Configuration
+@Component
+@EnableConfigurationProperties(InitProperties.class)
 public class InitContainer {
 
 
