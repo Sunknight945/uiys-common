@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -13,6 +14,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.util.SystemPropertyUtils;
 import uiys.common.util.TransUtils;
 
@@ -21,10 +23,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 @EnableConfigurationProperties(InitProperties.class)
+@ConditionalOnProperty(prefix = "uiys.common.init", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class InitContainer {
 
 
@@ -37,6 +41,9 @@ public class InitContainer {
 
     @PostConstruct
     public void init() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        log.info("初始化开始 {}, 超级慢.", stopWatch);
         Map<String, String> tableNameMap = new HashMap<>();
         Set<Class<?>> allClass;
         try {
@@ -60,6 +67,8 @@ public class InitContainer {
         }
         TransUtils instance = TransUtils.getInstance();
         tableNameMap.forEach(instance::setClassNameTable);
+        stopWatch.stop();
+        log.info("初始化结束 {}, 超级慢.", stopWatch);
     }
 
     /**
@@ -111,4 +120,12 @@ public class InitContainer {
     }
 
 
+    public static void main(String[] args) throws InterruptedException {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        log.info("初始化开始 {}, 超级慢.", stopWatch);
+        TimeUnit.SECONDS.sleep(5);
+        stopWatch.stop();
+        log.info("初始化结束 {}, 超级慢.", stopWatch);
+    }
 }
