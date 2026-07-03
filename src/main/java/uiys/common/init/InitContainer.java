@@ -1,12 +1,12 @@
 package uiys.common.init;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-@EnableConfigurationProperties(InitProperties.class)
+//@EnableConfigurationProperties(InitProperties.class)
 @ConditionalOnProperty(prefix = "uiys.common.init", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class InitContainer {
 
@@ -39,7 +39,8 @@ public class InitContainer {
         this.context = applicationContext;
     }
 
-    @PostConstruct
+    //    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void init() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -78,7 +79,7 @@ public class InitContainer {
         Set<Class<?>> classes = new HashSet<>();
         // 全局匹配所有class
         String scanPattern = SystemPropertyUtils.resolvePlaceholders(
-                PathMatchingResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "**/*.class");
+                PathMatchingResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "com/uiys/**/*.class");
 
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resolver);
