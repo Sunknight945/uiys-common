@@ -3,6 +3,7 @@ package uiys.common.util;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class DateUtils {
 
@@ -18,7 +19,14 @@ public class DateUtils {
     }
 
     public static LocalDateTime parseDateTime(String dateTimeStr) {
-        return LocalDateTime.parse(dateTimeStr, DATETIME_FORMATTER);
+        if (dateTimeStr == null || dateTimeStr.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(dateTimeStr, DATETIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("无法解析的日期时间: " + dateTimeStr, e);
+        }
     }
 
     // 也可直接使用 Hutool 的 DateUtil，这里提供薄封装
@@ -28,6 +36,9 @@ public class DateUtils {
      * 示例：100ms, 1.23s, 2m 15s, 1h 30m
      */
     public static String formatDuration(long nanos) {
+        if (nanos <= 0) {
+            return "0ms";
+        }
         Duration duration = Duration.ofNanos(nanos);
         long millis = duration.toMillis();
 

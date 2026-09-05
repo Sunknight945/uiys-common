@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -23,12 +24,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-//@EnableConfigurationProperties(InitProperties.class)
-@ConditionalOnProperty(prefix = "uiys.common.init", name = "enabled", havingValue = "true", matchIfMissing = true)
+@EnableConfigurationProperties(InitProperties.class)
+@ConditionalOnProperty(prefix = "uiys.common.init", name = "enabled", havingValue = "true")
 public class InitContainer {
 
 
@@ -62,8 +62,7 @@ public class InitContainer {
             }
             Table annotation1 = aClass.getAnnotation(Table.class);
             if (annotation1 != null) {
-                assert annotation != null;
-                tableNameMap.put(aClass.getName(), annotation.value());
+                tableNameMap.put(aClass.getName(), annotation1.name());
             }
         }
         TransUtils instance = TransUtils.getInstance();
@@ -100,33 +99,5 @@ public class InitContainer {
             }
         }
         return classes;
-    }
-
-    /**
-     * 驼峰转下划线表名
-     */
-    private String camelToUnderline(String str) {
-        if (str == null || str.isBlank()) return str;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (Character.isUpperCase(c)) {
-                if (i > 0) sb.append("_");
-                sb.append(Character.toLowerCase(c));
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
-
-
-    public static void main(String[] args) throws InterruptedException {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        log.info("初始化开始 {}, 超级慢.", stopWatch);
-        TimeUnit.SECONDS.sleep(5);
-        stopWatch.stop();
-        log.info("初始化结束 {}, 超级慢.", stopWatch);
     }
 }

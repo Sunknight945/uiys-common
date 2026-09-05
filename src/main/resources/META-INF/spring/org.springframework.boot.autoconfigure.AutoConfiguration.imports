@@ -1,3 +1,5 @@
 uiys.common.aop.LogAspect
 uiys.common.web.GlobalExceptionHandler
 uiys.common.init.InitContainer
+uiys.common.init.PermissionInit
+uiys.common.util.UserContentUtils

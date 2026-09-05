@@ -1,6 +1,5 @@
 package uiys.common.web;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -14,9 +13,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import uiys.common.constant.ResultCode;
 import uiys.common.data.ValidationException;
 import uiys.common.exception.BusinessException;
+import uiys.common.util.ExceptionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -116,7 +117,12 @@ public class GlobalExceptionHandler {
             logRequestInfo("展开后的业务异常", be);
             return Result.error(be.getCode(), be.getMsg());
         }
-
+        if (e instanceof NoResourceFoundException) {
+            NoResourceFoundException noResultException = (NoResourceFoundException) e;
+            logRequestInfo("资源不存在", noResultException);
+            log.error("资源不存在: ", noResultException);
+            return Result.error(ResultCode.NOT_FOUND.getCode(), noResultException.getMessage());
+        }
         // 兜底：记录完整错误信息
         logRequestInfo("系统异常", e);
         log.error("系统异常详情: ", e);
